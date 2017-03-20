@@ -55,7 +55,6 @@ namespace DatabaseLatencyTester
                         }
                     }
                 }
-                QueryMetrics.Succeeded.Mark();
             }
             catch (Exception ex)
             {
