@@ -44,7 +44,8 @@ namespace DatabaseLatencyTester
                 {
                     Name = q.Name,
                     Weighting = q.Weighting,
-                    Text = q.Text
+                    Text = q.Text,
+                    Isolation = q.Isolation
                 })
                 .ToArray();
 

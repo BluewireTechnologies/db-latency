@@ -27,7 +27,7 @@ namespace DatabaseLatencyTester
                 using (QueryMetrics.Total.NewContext(definition.Name))
                 {
                     using (var cn = new SqlConnection(connectionString))
-                    using (var scope = new TransactionScope(TransactionScopeOption.Required))
+                    using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = definition.Isolation }))
                     {
                         cn.InfoMessage += (s, e) => infoMessages.Add(e.Message);
                         using (QueryMetrics.OpenConnection.NewContext(definition.Name))

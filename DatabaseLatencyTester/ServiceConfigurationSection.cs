@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Configuration;
+using System.Transactions;
 
 namespace DatabaseLatencyTester
 {
@@ -42,6 +43,9 @@ namespace DatabaseLatencyTester
 
             [ConfigurationProperty("text", IsRequired = true)]
             public string Text => (string)base["text"];
+
+            [ConfigurationProperty("isolation", DefaultValue = IsolationLevel.ReadCommitted)]
+            public IsolationLevel Isolation => (IsolationLevel)base["isolation"];
         }
     }
 }
