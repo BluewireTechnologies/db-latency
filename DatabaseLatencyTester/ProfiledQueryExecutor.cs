@@ -18,6 +18,28 @@ namespace DatabaseLatencyTester
             this.connectionString = connectionString;
         }
 
+        public void ExecuteQueryWithoutMetrics(QueryDefinition definition)
+        {
+            using (var cn = new SqlConnection(connectionString))
+            using (var scope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = definition.Isolation }))
+            {
+                cn.Open();
+                var cmd = cn.CreateCommand();
+                cmd.CommandText = definition.Text;
+                cmd.CommandType = CommandType.Text;
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    do
+                    {
+                        ConsumeResultSet(reader);
+                    } while (reader.NextResult());
+                }
+
+                scope.Complete();
+            }
+        }
+
         public void ExecuteQuery(QueryDefinition definition)
         {
             var succeeded = true;

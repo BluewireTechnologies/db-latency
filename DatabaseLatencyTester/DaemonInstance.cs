@@ -16,6 +16,7 @@ namespace DatabaseLatencyTester
         private Timer timer;
         private readonly Random random = new Random();
         private readonly float totalWeights;
+        private bool firstRun = true;
 
         public DaemonInstance(QueryDefinition[] definitions, string connectionString, TimeSpan interval)
         {
@@ -27,6 +28,42 @@ namespace DatabaseLatencyTester
         }
 
         private void Tick()
+        {
+            if (firstRun)
+            {
+                bool acquired = false;
+                try
+                {
+                    Monitor.TryEnter(definitions, ref acquired);
+                    if (acquired) FirstRun();
+                }
+                finally
+                {
+                    if (acquired) Monitor.Exit(definitions);
+                }
+                firstRun = false;
+                return;
+            }
+
+            RunRandomQuery();
+        }
+
+        private void FirstRun()
+        {
+            try
+            {
+                foreach (var definition in definitions)
+                {
+                    new ProfiledQueryExecutor(connectionString).ExecuteQueryWithoutMetrics(definition);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        private void RunRandomQuery()
         {
             try
             {
